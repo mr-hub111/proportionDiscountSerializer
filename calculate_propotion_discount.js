@@ -115,7 +115,7 @@ const proportionDiscountSerializer = (billAndLists, options = {}) => {
     }, 0).toFixed(config_toFixed);
 
     if (Number(totalInlineProportionDiscountPrice) !== Number(billAndLists_data.price_bill_discount)) {
-        const findMaxiumIndex = billAndLists_data.lists.reduce((prev, curr, idx, arr) => {
+        const findIndexOfMaxProppotion = billAndLists_data.lists.reduce((prev, curr, idx, arr) => {
             if (idx === 0) { return prev; }
             if (Number(curr?.proportion_discount_ratio) > Number(arr[prev].proportion_discount_ratio)) { return idx; }
             if (Number(curr?.price_grand_total) > Number(arr[prev].price_grand_total)) { return idx; }
@@ -123,11 +123,11 @@ const proportionDiscountSerializer = (billAndLists, options = {}) => {
         }, 0);
         if (Number(totalInlineProportionDiscountPrice) < Number(billAndLists_data.price_bill_discount)) {
             const missingProportionDiscountPrice = (Number(billAndLists_data.price_bill_discount) - Number(totalInlineProportionDiscountPrice)).toFixed(config_toFixed + 1);
-            billAndLists_data.lists[findMaxiumIndex].proportion_discount_price = (Number(billAndLists_data.lists[findMaxiumIndex].proportion_discount_price) + Number(missingProportionDiscountPrice)).toFixed(config_toFixed);
+            billAndLists_data.lists[findIndexOfMaxProppotion].proportion_discount_price = (Number(billAndLists_data.lists[findIndexOfMaxProppotion].proportion_discount_price) + Number(missingProportionDiscountPrice)).toFixed(config_toFixed);
         }
         if (Number(totalInlineProportionDiscountPrice) > Number(billAndLists_data.price_bill_discount)) {
             const missingProportionDiscountPrice = (Number(totalInlineProportionDiscountPrice) - Number(billAndLists_data.price_bill_discount)).toFixed(config_toFixed);
-            billAndLists_data.lists[findMaxiumIndex].proportion_discount_price = (Number(billAndLists_data.lists[findMaxiumIndex].proportion_discount_price) - Number(missingProportionDiscountPrice)).toFixed(config_toFixed);
+            billAndLists_data.lists[findIndexOfMaxProppotion].proportion_discount_price = (Number(billAndLists_data.lists[findIndexOfMaxProppotion].proportion_discount_price) - Number(missingProportionDiscountPrice)).toFixed(config_toFixed);
         }
         /**
          * ตรวจสอบ ProportionDiscountPrice อีกครั้งว่าเท่ากับราคาส่วนลดท้ายบิลแล้วหรือยัง ถ้ายังจะไม่ให้ทำงานต่อ
@@ -136,10 +136,10 @@ const proportionDiscountSerializer = (billAndLists, options = {}) => {
             return (Number(prev) + Number(curr.proportion_discount_price))
         }, 0).toFixed(config_toFixed);
         if (Number(totalInlineProportionDiscountPrice__ReCheck) !== Number(billAndLists_data.price_bill_discount)) {
-            throw Error(`ค่า Proportion discount price ไม่สอดคล้องกันกับส่วนลดท้ายบิล จากการเติมราคาส่วนลดตามสัดส่วน ที่ขาดหายไป: รายการที่ (${findMaxiumIndex}), ราคาส่วนลดตามสัดส่วนที่เติมไปแล้ว (${billAndLists_data.lists[findMaxiumIndex].proportion_discount_price})`);
+            throw Error(`ค่า Proportion discount price ไม่สอดคล้องกันกับส่วนลดท้ายบิล จากการเติมราคาส่วนลดตามสัดส่วน ที่ขาดหายไป: รายการที่ (${findIndexOfMaxProppotion}), ราคาส่วนลดตามสัดส่วนที่เติมไปแล้ว (${billAndLists_data.lists[findIndexOfMaxProppotion].proportion_discount_price})`);
         }
     }
-
+    
     return billAndLists_data;
 };
 
